@@ -1,44 +1,76 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# `React electron typescript boilerplate`
 
-## Available Scripts
+<img src="https://cursosdedesarrollo.com/wp-content/uploads/2019/11/react.svg" width="100px">
+<img src="https://lineadecodigo.com/wp-content/uploads/2017/08/typescript.png" width="100px">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Electron_Software_Framework_Logo.svg/1200px-Electron_Software_Framework_Logo.svg.png" width="100px">
 
-In the project directory, you can run:
+This is a boilerplate that have a react app with typescript into electronjs.
 
-### `yarn start`
+## `Notes:`
+1. This was made to init a project, it has not been properly tested.
+2. Even if the react project was made with create-react-app template typescript, it have not support for css modules for types, you need to create a **<css.file>.module.d.ts** for each css module you have.
+3. The build for electron app it has not been tested.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## `How this boilerplate was made.`
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### `React app.`
 
-### `yarn test`
+The react app was made with create-react-app, with typescript template.
+`npx create-react-app ./ --template typescript`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+the `./` is for creating the app in the folder where you are, i usually create the folder first and then the app in that folder.
 
-### `yarn build`
+### `Electron.`
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+We added electron following this [article](https://medium.com/@xagustin93/a%C3%B1adiendo-react-a-una-aplicaci%C3%B3n-de-electron-ab3df35f48fd).
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Here are the step to add electron:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### `1) add electron dependencies and some usefull libraries.`
+`yarn add electron electron-builder wait-on concurrently --dev`
 
-### `yarn eject`
+#### `2) Create /public/electron.js file`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+const path = require('path');
+const isDev = process.env.NODE_ENV === 'production' ? false : true;
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+let mainWindow;
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+function createWindow() {
+  mainWindow = new BrowserWindow({width: 900, height: 680});
+  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+  if (isDev) {
+    // Open the DevTools.
+    //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
+    mainWindow.webContents.openDevTools();
+  }
+  mainWindow.on('closed', () => mainWindow = null);
+}
 
-## Learn More
+app.on('ready', createWindow);
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+app.on('activate', () => {
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
+```
+
+#### `3) Add this script in package.json.`
+`"electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\""`
+
+#### `4) Add main in package.json.`
+`"main": "public/electron.js"`
+
+then you can run **yarn electron-dev** to test the app.
