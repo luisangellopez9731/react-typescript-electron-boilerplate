@@ -11,7 +11,7 @@ This is a boilerplate that have a react app with typescript into electronjs.
 
 ## Notes:
 1. This was made to init a project, it has not been properly tested.
-2. Even if the react project was made with create-react-app template typescript, it have not support for css modules for types, you need to create a **<css.file>.module.d.ts** for each css module you have.
+2. Even if the react project was made with create-react-app template typescript, it have not support for css modules for types, you need to create a **<css-file-name>.module.css.d.ts** for each css module you have.
 3. The build for electron app it has not been tested.
 
 ## How this boilerplate was made.
